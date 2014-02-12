@@ -8,6 +8,13 @@ from bson.objectid import ObjectId
 # initialize config parser
 config = ConfigParser.RawConfigParser()
 
+
+'''
+Connects ports scraped from sites to ports in the database
+This connection will allow us to show additional information for ports (lat, long, etc..)
+
+The ports database is in mysql, it is derived from the UN database
+'''
 def rationalize():
     # mysql
     host = config.get("mysql", "host")
@@ -68,7 +75,12 @@ def rationalize():
     mconnection.close()
     connection.close()
             
-
+'''
+Update ports in the schedules collection
+Adds port information to every port in the schedule collection
+this will allow the web app to show lat, long, etc... information
+along with the schedules
+'''
 def update_ports():
     # mongo connection
     uri = config.get("mongodb", "uri")
@@ -96,7 +108,11 @@ def update_ports():
         schedule_collection.save(schedule);
     
     
-    
+
+'''
+Copy over ports from schedules collection to ports collection
+only copies ports that do not already exist
+'''
 def copy_distinct_ports_from_schedules():
     # mongo connection
     uri = config.get("mongodb", "uri")
@@ -113,6 +129,38 @@ def copy_distinct_ports_from_schedules():
         if ports_collection.find_one({"name":port}) is None:
             ports_collection.save({"name":port})
     
+
+'''
+One time copy of distinct ports to rationalize schedules table
+this should only be used once to populate the table
+'''
+def one_time_copy_distinct_ports_to_mysql_rationalize_schedules():
+    # mysql
+    host = config.get("mysql", "host")
+    user = config.get("mysql", "user")
+    passwd = config.get("mysql", "password")
+    db = config.get("mysql", "db")
+    mconnection = MySQLdb.connect(host=host,user=user, passwd=passwd, db=db)
+    cursor = mconnection.cursor()
+    
+    # mongo connection
+    uri = config.get("mongodb", "uri")
+    connection = MongoClient(uri)
+    db = connection[config.get("mongodb", "db")]
+    
+    insert_in_ports_rational_table = '''insert into rationalize_schedules (mongoid, ref_ports_id, mongoname) values (%(mongoid)s, %(refportid)s, %(mongoname)s)'''
+    
+    ports_collection = db.ports
+    
+    for port in ports_collection.find({},{"info.id":1, "name":1}):
+        data = {"mongoid": port['_id'], "refportid": 0, "mongoname": port['name'] }
+        if 'info' in port:
+            data['refportid'] = port['info']['id']
+        cursor.execute(insert_in_ports_rational_table, data)
+        mconnection.commit()
+    
+
+
 
 
 parser = OptionParser()
@@ -135,6 +183,8 @@ if options.action is not None:
         rationalize()
     elif options.action == 'update':
         update_ports()
+    elif options.action == 'once':
+        one_time_copy_distinct_ports_to_mysql_rationalize_schedules()
     
 else:  
     print "Sorry You must specify an action: -a <copy/rationalize>"  
