@@ -22,6 +22,7 @@ def start():
     
     urls = get_schedule_urls()
     for url in urls:
+        log = {"start": dt.now(), "url": url}
         parser = PageParser(url)
         schedules = parser.parse()
         for key in schedules:
@@ -47,7 +48,9 @@ def start():
             # save only performs an update if the document exists
             # otherwise inserts new one
             db.schedules.save(vessel)
-
+        # log the fact that we scraped this schedule
+        log['finish'] = dt.now()
+        db.scrapelogs.insert(log)
 
 
 def get_schedule_urls():
