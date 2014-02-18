@@ -35,7 +35,7 @@ def start():
                 f.write(carrier+"|"+vessel+"|"+scrape_date+"|"+voyage_number+"|"+port_name+"|"+eta+"|"+etd+"\n")
     
     # close file
-    f.closes()
+    f.close()
     connection.close()
                 
 
