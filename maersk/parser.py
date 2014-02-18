@@ -29,8 +29,8 @@ def start():
             # find the vessel in the schedule collection
             # if it doesn't exist then create a new one
             vessel = {"vessel":key,"carrier":"Maersk"}
-            if db.schedules.find_one(vessel):
-                vessel = db.schedules.find_one(vessel)
+            if db.schedules_temp.find_one(vessel):
+                vessel = db.schedules_temp.find_one(vessel)
             # format data for how we want to store it in mongo
             voyages = schedules[key]
             vessel['voyages'] = []
@@ -47,7 +47,7 @@ def start():
             vessel['scrape_date'] = dt.now()
             # save only performs an update if the document exists
             # otherwise inserts new one
-            db.schedules.save(vessel)
+            db.schedules_temp.save(vessel)
         # log the fact that we scraped this schedule
         log['finish'] = dt.now()
         db.scrapelogs.insert(log)

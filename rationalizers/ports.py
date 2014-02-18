@@ -89,7 +89,7 @@ def update_ports():
     
     # initialize collection
     ports_collection = db.ports
-    schedule_collection = db.schedules
+    schedule_collection = db.schedules_temp
     
     for schedule in schedule_collection.find():
         for voyage in schedule['voyages']:
@@ -119,7 +119,7 @@ def copy_distinct_ports_from_schedules():
     connection = MongoClient(uri)
     db = connection[config.get("mongodb", "db")]
     
-    schedule_collection = db.schedules
+    schedule_collection = db.schedules_temp
     ports_collection = db.ports
     
     ports = schedule_collection.distinct("voyages.ports.port")
