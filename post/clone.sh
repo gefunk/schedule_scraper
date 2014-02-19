@@ -4,15 +4,15 @@
 # clone the schedules_temp to schedules collection
 # remove the schedules_temp collection
 
-mongo_commands[0]="db.schedules.remove()"
-mongo_commands[1]="db.schedules_temp.find().forEach(function(x){db.schedules.insert(x);})"
-mongo_commands[2]="db.schedules_temp.remove()"
+if [$# -ne 4];
+    then echo "You need to pass 4 params: username password host carrier"
+fi
 
-echo $mongo_commands
+username=$1
+password=$2
+host=$3
+carrier=$4
 
-for command in ${mongo_commands[*]}
-do
-    echo "Running: $command"
-    mongo localhost/schedules --eval $command
-done
-
+mongo --username $username --password $password $host/schedules --eval "db.schedules.find({'carrier':'$carrier'}).remove()"
+mongo --username $username --password $password $host/schedules --eval "db.schedules_temp.find({'carrier':'$carrier'}).forEach(function(x){db.schedules.insert(x);})"
+mongo --username $username --password $password $host/schedules --eval "db.schedules_temp.find({'carrier':'$carrier'}).remove()"
