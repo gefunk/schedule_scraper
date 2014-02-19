@@ -4,8 +4,8 @@
 # clone the schedules_temp to schedules collection
 # remove the schedules_temp collection
 
-if [$# -ne 4];
-    then echo "You need to pass 4 params: username password host carrier"
+if [ "$#" -ne 4 ]; then
+    echo "You need to pass 4 params: username password host carrier"
 fi
 
 username=$1
