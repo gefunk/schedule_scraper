@@ -13,6 +13,6 @@ password=$2
 host=$3
 carrier=$4
 
-mongo --username $username --password $password $host/schedules --eval "db.schedules.find({'carrier':/$carrier/i}).remove()"
+mongo --username $username --password $password $host/schedules --eval "db.schedules.remove({'carrier':/$carrier/i})"
 mongo --username $username --password $password $host/schedules --eval "db.schedules_temp.find({'carrier':/$carrier/i}).forEach(function(x){db.schedules.insert(x);})"
-mongo --username $username --password $password $host/schedules --eval "db.schedules_temp.find({'carrier':/$carrier/i}).remove()"
+mongo --username $username --password $password $host/schedules --eval "db.schedules_temp.remove({'carrier':/$carrier/i})"
