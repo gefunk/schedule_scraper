@@ -18,21 +18,20 @@ def start():
     file_path = config.get('archive', 'path')
     timestr = time.strftime("%Y_%m_%d")
     f = open(file_path+timestr+"_scraper.csv", 'w')
-    
-    for schedule in schedule_collection.find():
-        for voyage in schedule['voyages']:
-            for port in voyage['ports']:
-                scrape_date = schedule["scrape_date"].strftime("%Y-%m-%d %H:%M:%S")
-                carrier = schedule["carrier"]
-                vessel = schedule["vessel"]
-                voyage_number = voyage['voyage']
-                print port
-                port_name = port['port']
-                eta = port['eta'].strftime("%Y-%m-%d %H:%M:%S")
-                etd = port['etd'].strftime("%Y-%m-%d %H:%M:%S")
-                print scrape_date
-                
-                f.write(carrier+"|"+vessel+"|"+scrape_date+"|"+voyage_number+"|"+port_name+"|"+eta+"|"+etd+"\n")
+
+    for voyage in schedule_collection.find():
+        for port in voyage['ports']:
+            scrape_date = schedule["scrape_date"].strftime("%Y-%m-%d %H:%M:%S")
+            carrier = schedule["carrier"]
+            vessel = schedule["vessel"]
+            voyage_number = voyage['voyage']
+            print port
+            port_name = port['port']
+            eta = port['eta'].strftime("%Y-%m-%d %H:%M:%S")
+            etd = port['etd'].strftime("%Y-%m-%d %H:%M:%S")
+            print scrape_date
+            
+            f.write(carrier+"|"+vessel+"|"+scrape_date+"|"+voyage_number+"|"+port_name+"|"+eta+"|"+etd+"\n")
     
     # close file
     f.close()

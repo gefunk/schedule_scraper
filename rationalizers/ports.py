@@ -50,7 +50,7 @@ def rationalize():
             port_id = rationalport[0]
             cursor.execute(find_ports_by_id_sql.format(port_id))
         else:
-            cursor.execute(find_ports_sql.format(port['name']))
+            cursor.execute(find_ports_sql.format(MySQLdb.escape_string(port['name'])))
         
         num_fields = len(cursor.description)
         field_names = [i[0] for i in cursor.description]
@@ -63,7 +63,6 @@ def rationalize():
             port['info'] = mport
             ports_collection.save(port)
         
-        print "Rational port {0}".format(rationalport)
         if not rationalport:
             data = {"mongoid":port["_id"], "refportid":0, "mongoname":port['name']}
             if 'info' in port:
@@ -91,21 +90,20 @@ def update_ports():
     ports_collection = db.ports
     schedule_collection = db.schedules_temp
     
-    for schedule in schedule_collection.find():
-        for voyage in schedule['voyages']:
-            for port in voyage['ports']:
-                if not 'info' in port:
-                    port_info = ports_collection.find_one({"name":port['port']}, {"info": 1})
-                    if 'info' in port_info:
-                        port_data = port_info['info'] 
-                        port['port_info'] = {
-                            "latitude": port_data["latitude"], 
-                            "longitude": port_data["longitude"],
-                            "port_code": port_data["port_code_c"],
-                            "city_code": port_data['port_code'],
-                            "country_code": port_data['country_code']
-                        }
-        schedule_collection.save(schedule);
+    for voyage in schedule_collection.find():
+        for port in voyage['ports']:
+            if not 'info' in port:
+                port_info = ports_collection.find_one({"name":port['port']}, {"info": 1})
+                if 'info' in port_info:
+                    port_data = port_info['info'] 
+                    port['port_info'] = {
+                        "latitude": port_data["latitude"], 
+                        "longitude": port_data["longitude"],
+                        "port_code": port_data["port_code_c"],
+                        "city_code": port_data['port_code'],
+                        "country_code": port_data['country_code']
+                    }
+        schedule_collection.save(voyage);
     
     
 
@@ -122,7 +120,7 @@ def copy_distinct_ports_from_schedules():
     schedule_collection = db.schedules_temp
     ports_collection = db.ports
     
-    ports = schedule_collection.distinct("voyages.ports.port")
+    ports = schedule_collection.distinct("ports.port")
     
     # copy over ports that don't exist in the ports collection
     for port in ports:

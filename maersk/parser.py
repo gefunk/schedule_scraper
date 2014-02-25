@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bs4 import BeautifulSoup
-import pprint
+
 
 
 # initialize config parser
@@ -22,32 +22,33 @@ def start():
     
     urls = get_schedule_urls()
     for url in urls:
-        log = {"start": dt.now(), "url": url}
+        log = {"start": dt.now(), "url": url, "carrier":"Maersk"}
         parser = PageParser(url)
         schedules = parser.parse()
-        for key in schedules:
-            # find the vessel in the schedule collection
-            # if it doesn't exist then create a new one
-            vessel = {"vessel":key,"carrier":"Maersk"}
-            if db.schedules_temp.find_one(vessel):
-                vessel = db.schedules_temp.find_one(vessel)
+        for vessel in schedules:
             # format data for how we want to store it in mongo
-            voyages = schedules[key]
-            vessel['voyages'] = []
-            for voyage in voyages:
+            voyages = schedules[vessel]
+            for voyage_key in voyages:
+                # find the voyage in the schedule collection
+                # if it doesn't exist then create a new one
+                voyage = {
+                    "vessel":vessel,
+                    "carrier":"Maersk", 
+                    "voyage":voyage_key,
+                    'url': url,
+                    'scrape_date': dt.now()
+                }
                 ports = []
-                for port in voyages[voyage]:
-                    port_data = voyages[voyage][port]
+                for port in voyages[voyage_key]:
+                    port_data = voyages[voyage_key][port]
                     port_data['port'] = port
                     ports.append(port_data)
-                vessel["voyages"].append({"voyage":voyage, "ports":ports})
-            
+                voyage["ports"] = ports
+                db.schedules_temp.save(voyage)
             # this data is used to help diagnose issues
-            vessel['url'] = url
-            vessel['scrape_date'] = dt.now()
             # save only performs an update if the document exists
             # otherwise inserts new one
-            db.schedules_temp.save(vessel)
+            
         # log the fact that we scraped this schedule
         log['finish'] = dt.now()
         db.scrapelogs.insert(log)
