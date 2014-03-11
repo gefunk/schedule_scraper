@@ -21,9 +21,9 @@ def start():
 
     for voyage in schedule_collection.find():
         for port in voyage['ports']:
-            scrape_date = schedule["scrape_date"].strftime("%Y-%m-%d %H:%M:%S")
-            carrier = schedule["carrier"]
-            vessel = schedule["vessel"]
+            scrape_date = voyage["scrape_date"].strftime("%Y-%m-%d %H:%M:%S")
+            carrier = voyage["carrier"]
+            vessel = voyage["vessel"]
             voyage_number = voyage['voyage']
             print port
             port_name = port['port']
