@@ -36,8 +36,8 @@ class RouteParseTest(unittest.TestCase):
         self.assertEqual(10, self.parser.get_two_digit_num_code("arr10"))
         
     def test_get_route(self):
-        ports = self.parser.get_port_heading('AWC')
-        schedules = self.parser.get_route('some route service','AWC', ports)
+        ports = self.parser.get_port_heading('TSS')
+        schedules = self.parser.get_route('some route service','TSS', ports)
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(schedules)
         

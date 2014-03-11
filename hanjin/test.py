@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import json
 from datetime import datetime
+import pprint
 
 url = 'http://www.hanjin.com/hanjin/CUP_HOM_3007GS.do'
 values = {'f_cmd' : '121',
@@ -11,7 +12,7 @@ values = {"f_cmd":'123',
             "rows":'10000',
             "_search":'false',
             "sord":'asc',
-            "vsl_slan_cd":'LW1',
+            "vsl_slan_cd":'TSS',
             "page":'1'}
 
 data = urllib.urlencode(values)
@@ -21,5 +22,8 @@ the_page = response.read()
 
 obj = json.loads(the_page)
 
-print obj
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(obj)
+
 

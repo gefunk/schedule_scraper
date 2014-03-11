@@ -99,7 +99,7 @@ class RouteParser():
         # clean out ports that don't have dates,
         # some ports in the table don't have dates, remove them from data
         for voyage in data:
-            for port in voyage['ports']:
+            for port in voyage['ports'][:]:
                 if "eta" not in port and "etd" not in port:
                     voyage['ports'].remove(port)
         
