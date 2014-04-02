@@ -14,7 +14,7 @@ continents = ['AA', 'MN', 'ML', 'EE', 'FF']
     
 def start():
     
-    routeParser = RouteParser("http://www.hanjin.com/hanjin/CUP_HOM_3007GS.do")
+    routeParser = RouteParser("http://www.hanjin.com/hanjin/CUP_HOM_3007.do")
     
     # mongo connection
     uri = config.get("mongodb", "uri")
